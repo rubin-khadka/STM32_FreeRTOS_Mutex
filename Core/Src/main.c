@@ -69,6 +69,7 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN 0 */
 
 SemaphoreHandle_t SimpleMutex;
+SemaphoreHandle_t BinarySemaphore;
 
 TaskHandle_t HPT_Handler;
 TaskHandle_t MPT_Handler;
@@ -81,8 +82,8 @@ void MPT_Task(void *argument);
 void Send_Uart(char *str)
 {
   xSemaphoreTake(SimpleMutex, portMAX_DELAY);
+  HAL_Delay(5000);
   HAL_UART_Transmit(&huart1, (uint8_t*) str, strlen(str), HAL_MAX_DELAY);
-  HAL_Delay(2000);
   xSemaphoreGive(SimpleMutex);
 }
 
@@ -121,16 +122,23 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   SimpleMutex = xSemaphoreCreateMutex();
-
   if(SimpleMutex != NULL)
   {
     HAL_UART_Transmit(&huart1, (uint8_t*) "Mutex Created\n\n", 15, 1000);
   }
 
+  BinarySemaphore = xSemaphoreCreateBinary();
+  if(BinarySemaphore != NULL)
+  {
+    HAL_UART_Transmit(&huart1, (uint8_t*) "Binary Semaphore Created\n\n", 26, 1000);
+  }
+
+  xSemaphoreGive(BinarySemaphore);
+
   // Create Tasks
   xTaskCreate(HPT_Task, "HPT", 128, NULL, 3, &HPT_Handler);
   xTaskCreate(MPT_Task, "MPT", 128, NULL, 2, &MPT_Handler);
-//  xTaskCreate(LPT_Task, "LPT", 128, NULL, 1, &LPT_Handler);
+  xTaskCreate(LPT_Task, "LPT", 128, NULL, 1, &LPT_Handler);
 
   vTaskStartScheduler();
   /* USER CODE END 2 */
@@ -253,23 +261,16 @@ void HPT_Task(void *argument)
     char *str2 = "Leaving HPT\n";
     HAL_UART_Transmit(&huart1, (uint8_t*) str2, strlen(str2), HAL_MAX_DELAY);
 
-    vTaskDelay(1500);
+    vTaskDelay(750);
   }
 }
 
 void MPT_Task(void *argument)
 {
-  char *str_send = "In MPT =====================\n";
   while(1)
   {
-    char *str = "Entered MPT and About to take mutex\n";
+    char *str = "In MPT =====================\n";
     HAL_UART_Transmit(&huart1, (uint8_t*) str, strlen(str), HAL_MAX_DELAY);
-
-    Send_Uart(str_send);
-
-    char *str2 = "Leaving MPT\n";
-    HAL_UART_Transmit(&huart1, (uint8_t*) str2, strlen(str2), HAL_MAX_DELAY);
-
     vTaskDelay(2000);
   }
 }
@@ -287,12 +288,10 @@ void LPT_Task(void *argument)
     char *str2 = "Leaving LPT\n";
     HAL_UART_Transmit(&huart1, (uint8_t*) str2, strlen(str2), HAL_MAX_DELAY);
 
-    vTaskDelay(2500);
+    vTaskDelay(1000);
   }
 }
 
-void LPT_Task(void *argument);
-void MPT_Task(void *argument);
 /* USER CODE END 4 */
 
 /**
