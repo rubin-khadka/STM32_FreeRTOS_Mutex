@@ -19,6 +19,10 @@ A mutex protects the UART transmission function, demonstrating how mutual exclus
 - Atomic Access: Ensures complete UART messages are transmitted without interruption
 - Task Synchronization: Tasks block when mutex is already held
 
+## UART Output
+
+https://github.com/user-attachments/assets/046c9d5c-74e3-4b9a-87ab-0f638013cfd7
+
 ## Hardware Requirements
 - STM32 development board (STM32F103C8T6 "Blue Pill")
 - USB-to-UART converter (for viewing debug messages)
@@ -71,28 +75,6 @@ Key Concepts
     - UART operations are atomic (cannot be interrupted)
     - Data integrity maintained
     - No message interleaving
-
-## Expected UART Output
-```
-Mutex Created
-Binary Semaphore Created
-
-Entered HPT and About to take mutex
-In HPT =====================
-
-Entered LPT and About to take mutex
-In LPT =====================
-
-In MPT =====================
-
-Entered HPT and About to take mutex
-In HPT =====================
-
-Entered LPT and About to take mutex
-In LPT =====================
-
-... (pattern continues)
-```
 
 ## Mutex vs Binary Semaphore Comparison
 
